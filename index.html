@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RR Auric Exports — Journey Through Kadapa</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C8960C;--gold2:#F0B429;--gold3:#FFD97D;
+  --soil:#0A0500;--rust:#3D1A00;--amber:#8B4513;
+  --cream:#FAF0D7;--mist:rgba(250,240,215,0.06);
+  --white:#FFFFFF;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--soil);
+  color:var(--cream);
+  font-family:'Georgia',serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ── CURSOR ── */
+.cursor{
+  position:fixed;width:12px;height:12px;
+  background:var(--gold);border-radius:50%;
+  pointer-events:none;z-index:9999;
+  mix-blend-mode:difference;
+  transform:translate(-50%,-50%);
+  transition:transform 0.1s;
+}
+.cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1px solid rgba(200,150,12,0.5);border-radius:50%;
+  pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:all 0.15s ease;
+}
+
+/* ── CANVAS ── */
+#canvas{
+  position:fixed;inset:0;z-index:0;
+  display:block;
+}
+
+/* ── PROGRESS ── */
+.progress-bar{
+  position:fixed;top:0;left:0;height:2px;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  z-index:100;transition:width 0.1s;
+  box-shadow:0 0 8px var(--gold);
+  width:0%;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:24px 48px;
+  background:linear-gradient(to bottom,rgba(10,5,0,0.9),transparent);
+}
+.logo{
+  font-size:15px;font-weight:400;letter-spacing:0.25em;
+  text-transform:uppercase;color:var(--gold);
+}
+.logo span{color:rgba(250,240,215,0.5);font-size:11px;
+  display:block;letter-spacing:0.35em;margin-top:2px;}
+.nav-r{
+  display:flex;gap:32px;align-items:center;
+}
+.nav-r a{
+  color:rgba(250,240,215,0.5);font-size:11px;letter-spacing:0.2em;
+  text-transform:uppercase;text-decoration:none;transition:color 0.3s;
+}
+.nav-r a:hover{color:var(--gold);}
+.nav-cta{
+  border:1px solid var(--gold);color:var(--gold);
+  font-size:11px;letter-spacing:0.2em;text-transform:uppercase;
+  padding:10px 24px;text-decoration:none;
+  transition:all 0.3s;background:transparent;cursor:none;
+}
+.nav-cta:hover{background:var(--gold);color:var(--soil);}
+
+/* ── SCROLL CONTAINER ── */
+.scroll-container{
+  position:relative;z-index:10;
+  pointer-events:none;
+}
+
+/* ── SCENE ── */
+.scene{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:120px 48px;
+  position:relative;
+}
+
+/* ── HERO SCENE ── */
+.hero-scene{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:0 48px;
+  position:relative;
+}
+.hero-pre{
+  font-size:10px;letter-spacing:0.4em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:40px;opacity:0;
+  animation:fadeUp 1s ease 0.5s forwards;
+}
+.hero-pre::before,.hero-pre::after{
+  content:'';display:inline-block;
+  width:40px;height:1px;background:var(--gold);
+  opacity:0.4;vertical-align:middle;margin:0 16px;
+}
+.hero-title{
+  font-size:clamp(56px,10vw,130px);
+  font-weight:400;line-height:0.95;letter-spacing:-0.02em;
+  margin-bottom:32px;
+  opacity:0;animation:fadeUp 1.2s ease 0.8s forwards;
+}
+.hero-title .line1{display:block;color:var(--cream);}
+.hero-title .line2{
+  display:block;
+  background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-sub{
+  font-size:clamp(14px,1.5vw,18px);
+  color:rgba(250,240,215,0.5);
+  max-width:480px;line-height:1.8;
+  margin:0 auto 56px;
+  opacity:0;animation:fadeUp 1s ease 1.2s forwards;
+}
+.hero-scroll{
+  position:absolute;bottom:48px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  opacity:0;animation:fadeUp 1s ease 2s forwards;
+}
+.scroll-line{
+  width:1px;height:64px;
+  background:linear-gradient(to bottom,var(--gold),transparent);
+  animation:scrollLine 2s ease-in-out infinite;
+}
+.scroll-text{
+  font-size:9px;letter-spacing:0.3em;text-transform:uppercase;
+  color:rgba(250,240,215,0.3);
+}
+@keyframes scrollLine{
+  0%{transform:scaleY(0);transform-origin:top;}
+  50%{transform:scaleY(1);transform-origin:top;}
+  51%{transform:scaleY(1);transform-origin:bottom;}
+  100%{transform:scaleY(0);transform-origin:bottom;}
+}
+
+/* ── TEXT SCENES ── */
+.scene-inner{
+  max-width:1000px;width:100%;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:center;
+}
+.scene-inner.center{
+  grid-template-columns:1fr;
+  text-align:center;max-width:700px;
+}
+.scene-inner.right{direction:rtl;}
+.scene-inner.right>*{direction:ltr;}
+
+.chapter{
+  font-size:9px;letter-spacing:0.4em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:24px;
+  display:flex;align-items:center;gap:12px;
+}
+.chapter::before{
+  content:'';width:32px;height:1px;background:var(--gold);opacity:0.5;
+}
+.scene-title{
+  font-size:clamp(36px,5vw,64px);font-weight:400;
+  line-height:1.1;margin-bottom:24px;color:var(--cream);
+}
+.scene-title em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.scene-body{
+  font-size:15px;line-height:1.9;
+  color:rgba(250,240,215,0.55);
+  font-family:'Georgia',serif;
+}
+.scene-body + .scene-body{margin-top:16px;}
+
+/* ── STAT BLOCKS ── */
+.stat-block{
+  border:1px solid rgba(200,150,12,0.15);
+  padding:32px;margin-top:40px;
+  position:relative;
+  background:rgba(200,150,12,0.03);
+}
+.stat-block::before{
+  content:'';position:absolute;top:-1px;left:0;width:60px;height:1px;
+  background:var(--gold);
+}
+.stat-num{
+  font-size:52px;font-weight:400;
+  color:var(--gold);line-height:1;margin-bottom:8px;
+}
+.stat-label{
+  font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(250,240,215,0.4);
+}
+
+/* ── FLOATING CARDS ── */
+.float-card{
+  background:rgba(10,5,0,0.8);
+  border:1px solid rgba(200,150,12,0.2);
+  padding:28px 32px;
+  backdrop-filter:blur(20px);
+  position:relative;
+}
+.float-card::after{
+  content:'';position:absolute;
+  top:-1px;left:0;width:40px;height:1px;
+  background:linear-gradient(90deg,var(--gold),transparent);
+}
+.card-label{
+  font-size:9px;letter-spacing:0.3em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:12px;opacity:0.7;
+}
+.card-value{
+  font-size:28px;color:var(--cream);line-height:1.2;
+  margin-bottom:6px;
+}
+.card-sub{font-size:12px;color:rgba(250,240,215,0.4);}
+
+/* ── CARDS GRID ── */
+.cards-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:rgba(200,150,12,0.1);margin-top:64px;
+  border:1px solid rgba(200,150,12,0.1);
+}
+.grid-card{
+  background:var(--soil);padding:40px 32px;
+  transition:background 0.4s;
+  pointer-events:all;cursor:none;
+}
+.grid-card:hover{background:rgba(200,150,12,0.05);}
+.gc-icon{
+  font-size:28px;margin-bottom:20px;
+  display:block;
+}
+.gc-title{
+  font-size:16px;color:var(--cream);
+  margin-bottom:12px;font-weight:400;
+}
+.gc-body{
+  font-size:13px;line-height:1.7;
+  color:rgba(250,240,215,0.4);
+}
+.gc-num{
+  font-size:10px;letter-spacing:0.3em;
+  color:var(--gold);margin-bottom:20px;opacity:0.5;
+}
+
+/* ── MARKETS SCENE ── */
+.markets-row{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:24px;margin-top:64px;width:100%;
+}
+.market-panel{
+  border:1px solid rgba(200,150,12,0.12);
+  padding:40px 32px;
+  background:rgba(200,150,12,0.02);
+  transition:all 0.4s;
+  pointer-events:all;cursor:none;
+  position:relative;overflow:hidden;
+}
+.market-panel::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(200,150,12,0.06),transparent);
+  opacity:0;transition:opacity 0.4s;
+}
+.market-panel:hover{border-color:rgba(200,150,12,0.4);}
+.market-panel:hover::before{opacity:1;}
+.mp-flag{font-size:40px;margin-bottom:20px;display:block;}
+.mp-name{
+  font-size:22px;color:var(--cream);margin-bottom:8px;
+}
+.mp-duty{
+  font-size:10px;letter-spacing:0.15em;text-transform:uppercase;
+  padding:4px 12px;margin-bottom:20px;display:inline-block;
+}
+.duty-0{background:rgba(46,125,50,0.2);color:#81C784;}
+.duty-m{background:rgba(245,127,23,0.15);color:#FFB74D;}
+.duty-p{background:rgba(13,71,161,0.2);color:#64B5F6;}
+.mp-list{list-style:none;}
+.mp-list li{
+  font-size:12px;color:rgba(250,240,215,0.4);
+  padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);
+  display:flex;gap:8px;line-height:1.5;
+}
+.mp-list li::before{content:'—';color:var(--gold);opacity:0.5;}
+
+/* ── COA SECTION ── */
+.coa-wrap{
+  border:1px solid rgba(200,150,12,0.2);
+  background:rgba(200,150,12,0.03);
+  padding:48px;margin-top:64px;position:relative;
+}
+.coa-wrap::before{
+  content:'CERTIFICATE OF ANALYSIS';
+  position:absolute;top:24px;right:24px;
+  font-size:9px;letter-spacing:0.25em;
+  color:rgba(200,150,12,0.3);
+}
+.coa-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.05);
+  font-size:14px;
+}
+.coa-row:last-child{border-bottom:none;}
+.coa-key{color:rgba(250,240,215,0.4);}
+.coa-val{color:var(--cream);font-size:16px;}
+.coa-val.gold{color:var(--gold);font-size:22px;}
+.coa-val.grn{color:#81C784;}
+
+/* ── FINAL SCENE ── */
+.final-scene{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:120px 48px;
+}
+.final-title{
+  font-size:clamp(48px,8vw,110px);
+  font-weight:400;line-height:0.95;
+  letter-spacing:-0.02em;margin-bottom:32px;
+}
+.final-title .t1{color:rgba(250,240,215,0.2);display:block;}
+.final-title .t2{
+  display:block;
+  background:linear-gradient(135deg,var(--gold),var(--gold2),#FFF5D0);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.final-sub{
+  font-size:16px;color:rgba(250,240,215,0.4);
+  max-width:420px;line-height:1.8;margin:0 auto 56px;
+}
+.final-actions{
+  display:flex;gap:20px;justify-content:center;flex-wrap:wrap;
+  pointer-events:all;
+}
+.btn-main{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:var(--soil);font-size:12px;letter-spacing:0.2em;
+  text-transform:uppercase;padding:18px 44px;
+  text-decoration:none;font-family:'Georgia',serif;
+  font-weight:400;transition:all 0.3s;cursor:none;
+  border:none;
+}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(200,150,12,0.4);}
+.btn-out{
+  background:transparent;color:rgba(250,240,215,0.6);
+  font-size:12px;letter-spacing:0.2em;text-transform:uppercase;
+  padding:18px 44px;text-decoration:none;
+  border:1px solid rgba(250,240,215,0.15);
+  font-family:'Georgia',serif;transition:all 0.3s;cursor:none;
+}
+.btn-out:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:10;
+  padding:48px;
+  border-top:1px solid rgba(200,150,12,0.1);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:16px;
+}
+.ft-logo{font-size:13px;letter-spacing:0.25em;color:var(--gold);}
+.ft-center{font-size:10px;letter-spacing:0.15em;
+  color:rgba(250,240,215,0.2);text-align:center;}
+.ft-right{font-size:10px;color:rgba(250,240,215,0.2);text-align:right;}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(32px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes float{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-16px);}
+}
+@keyframes glow{
+  0%,100%{box-shadow:0 0 20px rgba(200,150,12,0.2);}
+  50%{box-shadow:0 0 60px rgba(200,150,12,0.5);}
+}
+
+.reveal-up{
+  opacity:0;transform:translateY(48px);
+  transition:opacity 0.9s ease,transform 0.9s ease;
+}
+.reveal-up.in{opacity:1;transform:translateY(0);}
+.reveal-left{
+  opacity:0;transform:translateX(-48px);
+  transition:opacity 0.9s ease,transform 0.9s ease;
+}
+.reveal-left.in{opacity:1;transform:translateX(0);}
+.reveal-right{
+  opacity:0;transform:translateX(48px);
+  transition:opacity 0.9s ease,transform 0.9s ease;
+}
+.reveal-right.in{opacity:1;transform:translateX(0);}
+
+/* ── PARTICLES ── */
+.particle{
+  position:fixed;border-radius:50%;
+  pointer-events:none;z-index:1;
+  animation:float var(--dur,6s) ease-in-out var(--delay,0s) infinite;
+}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  nav{padding:20px 24px;}
+  .scene{padding:80px 24px;}
+  .scene-inner{grid-template-columns:1fr;gap:40px;}
+  .scene-inner.right{direction:ltr;}
+  .cards-grid{grid-template-columns:1fr;}
+  .markets-row{grid-template-columns:1fr;}
+  .hero-title{font-size:clamp(42px,12vw,72px);}
+  .final-title{font-size:clamp(40px,10vw,72px);}
+  footer{padding:32px 24px;flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- CANVAS (WebGL world) -->
+<canvas id="canvas"></canvas>
+
+<!-- PROGRESS -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    RR Auric Exports
+    <span>Kadapa · Andhra Pradesh · India</span>
+  </div>
+  <div class="nav-r">
+    <a href="#product">Products</a>
+    <a href="#quality">Quality</a>
+    <a href="#markets">Markets</a>
+    <a href="#contact" class="nav-cta">Request Sample</a>
+  </div>
+</nav>
+
+<!-- SCROLL CONTENT -->
+<div class="scroll-container">
+
+  <!-- SCENE 1: HERO -->
+  <section class="hero-scene">
+    <div class="hero-pre">Rajampet, Kadapa District · Est. 2026</div>
+    <h1 class="hero-title">
+      <span class="line1">From the</span>
+      <span class="line2">Red Soil</span>
+    </h1>
+    <p class="hero-sub">
+      A journey through Kadapa's turmeric highlands — where ancient earth meets documented science, and every shipment carries a promise no other exporter can make.
+    </p>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span class="scroll-text">Begin the journey</span>
+    </div>
+  </section>
+
+  <!-- SCENE 2: THE LAND -->
+  <section class="scene" id="land">
+    <div class="scene-inner reveal-up">
+      <div>
+        <div class="chapter">Chapter I — The Origin</div>
+        <h2 class="scene-title">Where geology becomes <em>gold</em></h2>
+        <p class="scene-body">
+          The Kadapa basin of Andhra Pradesh holds one of the oldest geological formations on earth — laterite soil rich in iron, manganese and trace minerals that concentrate in the Curcuma longa rhizome as curcuminoids.
+        </p>
+        <p class="scene-body" style="margin-top:16px">
+          This is not farming. This is alchemy — sun, soil and time producing curcumin percentages that the plains cannot replicate.
+        </p>
+        <div class="stat-block reveal-up">
+          <div class="stat-num">0 km</div>
+          <div class="stat-label">Distance from Rajampet to our sourcing farms</div>
+        </div>
+      </div>
+      <div>
+        <div class="float-card reveal-right" style="margin-bottom:20px;animation:float 7s ease-in-out infinite">
+          <div class="card-label">Soil Type</div>
+          <div class="card-value">Red Laterite</div>
+          <div class="card-sub">Kadapa District · Pre-Cambrian Formation</div>
+        </div>
+        <div class="float-card reveal-right" style="animation:float 9s ease-in-out 1s infinite">
+          <div class="card-label">Curcumin Range</div>
+          <div class="card-value" style="color:var(--gold)">3.5 — 5.5%</div>
+          <div class="card-sub">NABL HPLC tested · Above national average</div>
+        </div>
+        <div class="float-card reveal-right" style="margin-top:20px;animation:float 8s ease-in-out 2s infinite">
+          <div class="card-label">Port Access</div>
+          <div class="card-value">Krishnapatnam</div>
+          <div class="card-sub">Nearest port · 5–7 days to Jebel Ali</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 3: THE SCIENCE -->
+  <section class="scene" id="quality">
+    <div class="scene-inner center reveal-up">
+      <div>
+        <div class="chapter" style="justify-content:center">Chapter II — The Proof</div>
+        <h2 class="scene-title">We don't claim curcumin.<br><em>We measure it.</em></h2>
+        <p class="scene-body" style="max-width:520px;margin:0 auto">
+          Every commercial lot is independently tested at the Spices Board Quality Evaluation Laboratory in Guntur — a NABL-accredited facility — before a single bag is packed.
+        </p>
+      </div>
+      <div class="coa-wrap reveal-up" style="max-width:620px;margin:64px auto 0">
+        <div class="coa-row">
+          <span class="coa-key">Product</span>
+          <span class="coa-val">Double Polished Turmeric Fingers</span>
+        </div>
+        <div class="coa-row">
+          <span class="coa-key">Origin</span>
+          <span class="coa-val">Kadapa District, Andhra Pradesh, India</span>
+        </div>
+        <div class="coa-row">
+          <span class="coa-key">Curcumin (HPLC)</span>
+          <span class="coa-val gold" id="curcCount">0.0%</span>
+        </div>
+        <div class="coa-row">
+          <span class="coa-key">Moisture</span>
+          <span class="coa-val grn">9.2% — Pass</span>
+        </div>
+        <div class="coa-row">
+          <span class="coa-key">Pesticide Residues</span>
+          <span class="coa-val grn">Within FSSAI Limits — Pass</span>
+        </div>
+        <div class="coa-row">
+          <span class="coa-key">Aflatoxin B1</span>
+          <span class="coa-val grn">Below 5 ppb — Pass</span>
+        </div>
+        <div class="coa-row">
+          <span class="coa-key">Tested at</span>
+          <span class="coa-val" style="font-size:13px">Spices Board QEL, Guntur · NABL Accredited</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 4: THE JOURNEY -->
+  <section class="scene" id="product">
+    <div class="scene-inner right reveal-up">
+      <div>
+        <div class="chapter">Chapter III — The Products</div>
+        <h2 class="scene-title">Two forms.<br><em>One origin.</em></h2>
+        <p class="scene-body">
+          Double polished fingers for wholesale importers and food processors. Turmeric powder for nutraceutical and FMCG buyers who need consistent colour and curcumin in every batch.
+        </p>
+        <p class="scene-body" style="margin-top:16px">
+          Both carry the same NABL COA. Same origin. Same promise.
+        </p>
+      </div>
+      <div class="cards-grid" style="grid-template-columns:1fr;gap:1px;margin-top:0" class="reveal-left">
+        <div class="grid-card">
+          <div class="gc-num">01</div>
+          <span class="gc-icon">🌿</span>
+          <div class="gc-title">Double Polished Fingers</div>
+          <div class="gc-body">HS 09103010 · CIF / FOB · 25 kg PP bags · Min 1 MT trial. CEPA COO included for UAE buyers — 0% import duty.</div>
+        </div>
+        <div class="grid-card">
+          <div class="gc-num">02</div>
+          <span class="gc-icon">✨</span>
+          <div class="gc-title">Turmeric Powder</div>
+          <div class="gc-body">HS 09103020 · 60 mesh standard · 25 kg PP bags · Min 500 kg. Consistent ASTA colour and curcumin in every lot.</div>
+        </div>
+        <div class="grid-card">
+          <div class="gc-num">03</div>
+          <span class="gc-icon">🔬</span>
+          <div class="gc-title">Year 2 — Curcumin Extract</div>
+          <div class="gc-body">95% curcuminoid extract for nutraceutical brands. Organic certification path in progress. Premium pricing segment.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 5: MARKETS -->
+  <section class="scene" id="markets">
+    <div class="scene-inner center reveal-up">
+      <div>
+        <div class="chapter" style="justify-content:center">Chapter IV — The World</div>
+        <h2 class="scene-title">Three markets.<br><em>One origin story.</em></h2>
+        <p class="scene-body" style="max-width:480px;margin:0 auto">
+          UAE first — the gateway. Malaysia second — the bridge to ASEAN. USA third — the premium horizon.
+        </p>
+      </div>
+      <div class="markets-row">
+        <div class="market-panel reveal-left">
+          <span class="mp-flag">🇦🇪</span>
+          <div class="mp-name">United Arab Emirates</div>
+          <span class="mp-duty duty-0">0% Duty — CEPA</span>
+          <ul class="mp-list">
+            <li>5–7 days via Krishnapatnam to Jebel Ali</li>
+            <li>CEPA Certificate of Origin included</li>
+            <li>AED pegged to USD — no currency risk</li>
+            <li>GCC and East Africa re-export hub</li>
+          </ul>
+        </div>
+        <div class="market-panel reveal-up">
+          <span class="mp-flag">🇲🇾</span>
+          <div class="mp-name">Malaysia</div>
+          <span class="mp-duty duty-m">Active Import Market</span>
+          <ul class="mp-list">
+            <li>194 active turmeric importers</li>
+            <li>Port Klang and Penang — major hubs</li>
+            <li>High curcumin for food colouring industry</li>
+            <li>ASEAN bridge for further distribution</li>
+          </ul>
+        </div>
+        <div class="market-panel reveal-right">
+          <span class="mp-flag">🇺🇸</span>
+          <div class="mp-name">United States</div>
+          <span class="mp-duty duty-p">Premium + Organic</span>
+          <ul class="mp-list">
+            <li>Largest global turmeric importer</li>
+            <li>Nutraceutical supplement demand</li>
+            <li>Organic certification roadmap Year 2</li>
+            <li>Premium pricing for documented curcumin</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 6: WHAT SETS APART -->
+  <section class="scene">
+    <div class="scene-inner center reveal-up">
+      <div>
+        <div class="chapter" style="justify-content:center">Chapter V — The Difference</div>
+        <h2 class="scene-title">What others claim.<br><em>We document.</em></h2>
+      </div>
+      <div class="cards-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="grid-card">
+          <div class="gc-num">—</div>
+          <span class="gc-icon">📄</span>
+          <div class="gc-title">COA Before You Ask</div>
+          <div class="gc-body">We attach the NABL HPLC certificate to the first email — before any buyer requests it. No other Kadapa exporter does this.</div>
+        </div>
+        <div class="grid-card">
+          <div class="gc-num">—</div>
+          <span class="gc-icon">⚓</span>
+          <div class="gc-title">CEPA Zero Duty</div>
+          <div class="gc-body">Every UAE shipment carries a CEPA Certificate of Origin. 0% import duty at Jebel Ali. This is a structural cost advantage, not a discount.</div>
+        </div>
+        <div class="grid-card">
+          <div class="gc-num">—</div>
+          <span class="gc-icon">🎯</span>
+          <div class="gc-title">Limited Buyers</div>
+          <div class="gc-body">We work with 4–5 buyers at a time. Founder-level attention on every shipment — from farm inspection to container stuffing.</div>
+        </div>
+        <div class="grid-card">
+          <div class="gc-num">—</div>
+          <span class="gc-icon">🌱</span>
+          <div class="gc-title">Farm Proximity</div>
+          <div class="gc-body">Rajampet is 0–20 km from sourcing farms. We inspect stock personally. No blind sourcing through intermediaries.</div>
+        </div>
+        <div class="grid-card">
+          <div class="gc-num">—</div>
+          <span class="gc-icon">🔒</span>
+          <div class="gc-title">Retain Samples</div>
+          <div class="gc-body">200g retain sample kept from every commercial lot for 90 days. Complete audit trail if any dispute arises at destination.</div>
+        </div>
+        <div class="grid-card">
+          <div class="gc-num">—</div>
+          <span class="gc-icon">📦</span>
+          <div class="gc-title">Full Document Set</div>
+          <div class="gc-body">CI, PL, COA, Phytosanitary, Fumigation, CEPA COO, BL — complete set couriered on dispatch day. No document delays.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 7: CONTACT -->
+  <section class="scene" id="contact">
+    <div class="final-scene">
+      <div class="chapter" style="justify-content:center;margin-bottom:32px">Begin Here</div>
+      <div class="final-title">
+        <span class="t1">Your next</span>
+        <span class="t2">supplier.</span>
+      </div>
+      <p class="final-sub">
+        Request a 25 kg courier sample and NABL COA. Your lab tests independently before any commitment. We respond within 2 hours.
+      </p>
+      <div class="final-actions">
+        <a href="mailto:info@rrauricexports.in?subject=Sample Request — Kadapa Turmeric&body=Hello, I would like to request a 25kg sample and COA. My requirement:" class="btn-main">Request Sample + COA</a>
+        <a href="https://wa.me/917416928731?text=Hello, I am interested in Kadapa turmeric. Can you share your COA and pricing?" class="btn-out">WhatsApp Us</a>
+      </div>
+
+      <!-- Contact Details -->
+      <div style="margin-top:80px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:700px;width:100%;pointer-events:all">
+        <div class="float-card" style="text-align:left">
+          <div class="card-label">WhatsApp</div>
+          <div class="card-value" style="font-size:16px">+91 [7416928731]</div>
+          <div class="card-sub">9 AM–6 PM IST</div>
+        </div>
+        <div class="float-card" style="text-align:left">
+          <div class="card-label">Email</div>
+          <div class="card-value" style="font-size:14px">info@rrauricexports.in</div>
+          <div class="card-sub">Reply in 2 hours</div>
+        </div>
+        <div class="float-card" style="text-align:left">
+          <div class="card-label">Origin</div>
+          <div class="card-value" style="font-size:14px">Rajampet, Kadapa</div>
+          <div class="card-sub">Andhra Pradesh 516115</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">RR Auric Exports</div>
+  <div class="ft-center">
+    IEC: [XXXXXXXXXX] · Spices Board CRES: [XXXXXXX] · APEDA RCMC<br>
+    FSSAI Central · ECGC Insured · NABL HPLC Every Lot
+  </div>
+  <div class="ft-right">
+    © 2026 RR Auric Exports<br>
+    Built from the red soil up.
+  </div>
+</footer>
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+// CURSOR
+// ══════════════════════════════════════════════════════════════
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+});
+
+(function animCursor(){
+  rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(animCursor);
+})();
+
+document.querySelectorAll('a,button,.grid-card,.market-panel').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.transform='translate(-50%,-50%) scale(2)';
+    ring.style.transform='translate(-50%,-50%) scale(1.5)';
+    ring.style.borderColor='var(--gold)';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.transform='translate(-50%,-50%) scale(1)';
+    ring.style.transform='translate(-50%,-50%) scale(1)';
+    ring.style.borderColor='rgba(200,150,12,0.5)';
+  });
+});
+
+// ══════════════════════════════════════════════════════════════
+// WEBGL — LIVING LANDSCAPE
+// ══════════════════════════════════════════════════════════════
+const canvas = document.getElementById('canvas');
+const renderer = new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.setClearColor(0x0A0500,1);
+renderer.shadowMap.enabled=true;
+
+const scene3 = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,1000);
+camera.position.set(0,8,28);
+camera.lookAt(0,0,0);
+
+// Fog
+scene3.fog = new THREE.FogExp2(0x1A0800,0.028);
+
+// ── TERRAIN (mountains from Kadapa) ──
+function createTerrain(w,d,segs,heightMap,color1,color2){
+  const geo = new THREE.PlaneGeometry(w,d,segs,segs);
+  geo.rotateX(-Math.PI/2);
+  const pos = geo.attributes.position;
+  for(let i=0;i<pos.count;i++){
+    const x=pos.getX(i), z=pos.getZ(i);
+    const h = heightMap(x,z);
+    pos.setY(i,h);
+  }
+  geo.computeVertexNormals();
+  // Vertex colouring by height
+  const colors=[];
+  for(let i=0;i<pos.count;i++){
+    const y=pos.getY(i);
+    const t=Math.max(0,Math.min(1,(y+2)/12));
+    const c1=new THREE.Color(color1);
+    const c2=new THREE.Color(color2);
+    c1.lerp(c2,t);
+    colors.push(c1.r,c1.g,c1.b);
+  }
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+  const mat = new THREE.MeshLambertMaterial({vertexColors:true,wireframe:false});
+  return new THREE.Mesh(geo,mat);
+}
+
+// Main terrain
+const mainTerrain = createTerrain(120,120,80,(x,z)=>{
+  let h=0;
+  h += Math.sin(x*0.08)*3.5 + Math.cos(z*0.09)*3;
+  h += Math.sin(x*0.18+1.2)*1.8 + Math.cos(z*0.15-0.8)*2;
+  h += Math.sin(x*0.35)*0.8 + Math.cos(z*0.4)*0.6;
+  // Red laterite mountains
+  h += Math.exp(-((x-8)**2+(z-5)**2)/80)*9;
+  h += Math.exp(-((x+15)**2+(z+10)**2)/60)*7;
+  h += Math.exp(-((x-20)**2+(z-15)**2)/50)*6;
+  h += Math.exp(-((x+5)**2+(z-20)**2)/40)*5;
+  return h-2;
+},0x3D1500,0xC8960C);
+scene3.add(mainTerrain);
+
+// Far background mountains
+const bgMountain = createTerrain(200,200,40,(x,z)=>{
+  let h=0;
+  h += Math.sin(x*0.04)*6 + Math.cos(z*0.05)*5;
+  h += Math.exp(-((x-10)**2+(z+20)**2)/200)*14;
+  h += Math.exp(-((x+20)**2+(z-10)**2)/150)*12;
+  return h-10;
+},0x1A0800,0x5C2800);
+bgMountain.position.set(0,-8,-40);
+scene3.add(bgMountain);
+
+// ── TURMERIC PLANTS (simple geometry) ──
+function createPlant(x,y,z,scale=1){
+  const group=new THREE.Group();
+  // Stem
+  const stem=new THREE.Mesh(
+    new THREE.CylinderGeometry(0.04*scale,0.06*scale,1.2*scale,6),
+    new THREE.MeshLambertMaterial({color:0x4A6B2A})
+  );
+  stem.position.y=0.6*scale;
+  group.add(stem);
+  // Leaves
+  for(let i=0;i<4;i++){
+    const leaf=new THREE.Mesh(
+      new THREE.SphereGeometry(0.3*scale,4,4),
+      new THREE.MeshLambertMaterial({color:0x3D5A1E})
+    );
+    leaf.scale.set(0.4,1.2,0.25);
+    const a=i/4*Math.PI*2;
+    leaf.position.set(Math.cos(a)*0.4*scale,0.9*scale+i*0.1,Math.sin(a)*0.3*scale);
+    leaf.rotation.z=a+0.5;
+    group.add(leaf);
+  }
+  // Flower (gold/orange)
+  const flower=new THREE.Mesh(
+    new THREE.SphereGeometry(0.18*scale,8,6),
+    new THREE.MeshLambertMaterial({color:0xE8A020,emissive:0x8B5E00,emissiveIntensity:0.3})
+  );
+  flower.position.y=1.4*scale;
+  group.add(flower);
+  group.position.set(x,y,z);
+  return group;
+}
+
+// Scatter turmeric plants
+const plantData=[[3,0.2,2],[6,-0.5,4],[10,1,6],[-4,0.5,3],[8,0.8,0],
+  [-7,-0.3,5],[12,1.5,8],[2,0.4,-3],[15,2,10],[-3,0.8,-5],
+  [5,1.2,12],[9,0.5,-8],[0,0.2,8],[-10,0.5,10],[7,1,15]];
+plantData.forEach(([x,y,z])=>{
+  const s=0.6+Math.random()*0.8;
+  scene3.add(createPlant(x,y,z,s));
+});
+
+// ── FLOATING PARTICLES (gold dust) ──
+const partGeo = new THREE.BufferGeometry();
+const partCount = 800;
+const partPositions = new Float32Array(partCount*3);
+for(let i=0;i<partCount;i++){
+  partPositions[i*3]  =(Math.random()-0.5)*80;
+  partPositions[i*3+1]=(Math.random()-0.5)*30+5;
+  partPositions[i*3+2]=(Math.random()-0.5)*80;
+}
+partGeo.setAttribute('position',new THREE.BufferAttribute(partPositions,3));
+const partMat=new THREE.PointsMaterial({
+  color:0xC8960C,size:0.12,transparent:true,opacity:0.7,
+  sizeAttenuation:true
+});
+const particles=new THREE.Points(partGeo,partMat);
+scene3.add(particles);
+
+// ── FIREFLIES ──
+function createFirefly(x,y,z){
+  const g=new THREE.Mesh(
+    new THREE.SphereGeometry(0.08,6,6),
+    new THREE.MeshBasicMaterial({color:0xFFD97D,transparent:true,opacity:0.9})
+  );
+  g.position.set(x,y,z);
+  // Glow
+  const glow=new THREE.Mesh(
+    new THREE.SphereGeometry(0.18,6,6),
+    new THREE.MeshBasicMaterial({color:0xC8960C,transparent:true,opacity:0.25})
+  );
+  g.add(glow);
+  g.userData={ox:x,oy:y,oz:z,speed:0.3+Math.random()*0.5,phase:Math.random()*Math.PI*2};
+  return g;
+}
+const fireflies=[];
+for(let i=0;i<30;i++){
+  const f=createFirefly(
+    (Math.random()-0.5)*40,
+    2+Math.random()*12,
+    (Math.random()-0.5)*30
+  );
+  scene3.add(f);
+  fireflies.push(f);
+}
+
+// ── LIGHTING ──
+const ambient=new THREE.AmbientLight(0x3D1A00,0.8);
+scene3.add(ambient);
+const sun=new THREE.DirectionalLight(0xFFB347,1.8);
+sun.position.set(20,30,-10);
+sun.castShadow=true;
+scene3.add(sun);
+const fillLight=new THREE.PointLight(0xC8960C,1.2,60);
+fillLight.position.set(-10,15,0);
+scene3.add(fillLight);
+const goldFog=new THREE.PointLight(0xFFD97D,0.8,30);
+goldFog.position.set(5,5,10);
+scene3.add(goldFog);
+
+// ── MIST PLANES ──
+for(let i=0;i<6;i++){
+  const mist=new THREE.Mesh(
+    new THREE.PlaneGeometry(30+Math.random()*20,6+Math.random()*4),
+    new THREE.MeshBasicMaterial({color:0x8B5E2A,transparent:true,opacity:0.04+Math.random()*0.06,depthWrite:false,side:THREE.DoubleSide})
+  );
+  mist.rotation.x=-Math.PI/2;
+  mist.position.set((Math.random()-0.5)*40,0.5+i*0.3,(Math.random()-0.5)*30);
+  scene3.add(mist);
+}
+
+// ── SCROLL + CAMERA ──
+let scrollY=0,targetCamY=8,targetCamZ=28,targetCamX=0,targetLookY=0;
+const maxScroll=document.body.scrollHeight-innerHeight;
+
+window.addEventListener('scroll',()=>{
+  scrollY=window.scrollY;
+  const p=scrollY/maxScroll;
+  document.getElementById('progressBar').style.width=(p*100)+'%';
+  // Camera journey through the world
+  targetCamY = 8 - p*6;
+  targetCamZ = 28 - p*18;
+  targetCamX = Math.sin(p*Math.PI*1.5)*8;
+  targetLookY = p*-3;
+});
+
+// Mouse parallax
+let mouseX=0,mouseY=0;
+document.addEventListener('mousemove',e=>{
+  mouseX=(e.clientX/innerWidth-0.5)*0.5;
+  mouseY=(e.clientY/innerHeight-0.5)*0.3;
+});
+
+// ── ANIMATE ──
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t=clock.getElapsedTime();
+
+  // Camera lerp
+  camera.position.x+=(targetCamX+mouseX*3-camera.position.x)*0.05;
+  camera.position.y+=(targetCamY+mouseY*2-camera.position.y)*0.05;
+  camera.position.z+=(targetCamZ-camera.position.z)*0.05;
+  camera.lookAt(mouseX*2,targetLookY,0);
+
+  // Particles drift
+  const pp=particles.geometry.attributes.position;
+  for(let i=0;i<partCount;i++){
+    pp.setY(i,pp.getY(i)+Math.sin(t*0.3+i)*0.003);
+    if(pp.getY(i)>20) pp.setY(i,-8);
+  }
+  pp.needsUpdate=true;
+  particles.rotation.y=t*0.015;
+
+  // Fireflies orbit
+  fireflies.forEach(f=>{
+    const {ox,oy,oz,speed,phase}=f.userData;
+    f.position.x=ox+Math.sin(t*speed+phase)*2;
+    f.position.y=oy+Math.sin(t*speed*1.3+phase)*1.2;
+    f.position.z=oz+Math.cos(t*speed*0.8+phase)*1.8;
+    f.material.opacity=0.5+Math.sin(t*2+phase)*0.4;
+  });
+
+  // Lights pulse
+  fillLight.intensity=1.2+Math.sin(t*0.7)*0.3;
+  goldFog.position.x=5+Math.sin(t*0.4)*8;
+  goldFog.position.z=10+Math.cos(t*0.35)*8;
+
+  // Sun angle
+  sun.position.x=20+Math.sin(t*0.05)*10;
+
+  renderer.render(scene3,camera);
+}
+animate();
+
+// ── RESIZE ──
+window.addEventListener('resize',()=>{
+  renderer.setSize(innerWidth,innerHeight);
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+});
+
+// ══════════════════════════════════════════════════════════════
+// SCROLL REVEALS
+// ══════════════════════════════════════════════════════════════
+const revealObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add('in');
+  });
+},{threshold:0.12});
+document.querySelectorAll('.reveal-up,.reveal-left,.reveal-right')
+  .forEach(el=>revealObs.observe(el));
+
+// ══════════════════════════════════════════════════════════════
+// CURCUMIN COUNTER
+// ══════════════════════════════════════════════════════════════
+let curcStarted=false;
+const curcObs=new IntersectionObserver(entries=>{
+  if(entries[0].isIntersecting && !curcStarted){
+    curcStarted=true;
+    const el=document.getElementById('curcCount');
+    const target=4.8; let current=0;
+    const start=performance.now();
+    function step(now){
+      const progress=Math.min((now-start)/2000,1);
+      const ease=1-Math.pow(1-progress,3);
+      current=target*ease;
+      el.textContent=current.toFixed(1)+'% w/w';
+      if(progress<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+},{threshold:0.5});
+const curcEl=document.getElementById('curcCount');
+if(curcEl) curcObs.observe(curcEl.closest('.coa-wrap'));
+</script>
+</body>
+</html>
